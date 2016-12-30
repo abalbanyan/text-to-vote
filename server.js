@@ -28,7 +28,7 @@ MongoClient.connect('mongodb://heroku_cxgp2vvm:caetrp2v57asq6a593ub7i7891@ds1492
 	};
 	var addAnime = function(req, res){
 		req.body.votes = 2;
-		req.body.animeID = collection.count() + 1;
+		req.body.animeID = toString(collection.count() + 1);
 		console.log(req.body);
 		collection.insert(req.body, function(err, docs){
 			console.log(docs);
