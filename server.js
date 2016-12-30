@@ -5,9 +5,9 @@ app.use(bodyParser());
 var port = process.env.PORT || 8080; // process.env.PORT lets heroku set the port.
 MongoClient = require('mongodb').MongoClient;
 
-//var accountSid = 'AC9550722b43b00be70c63b686a2cc07c0';
-//var authToken = '9a93918597cfc083f72a4f443b4420ef';
-//var twilio = require('twilio');
+var accountSid = 'AC9550722b43b00be70c63b686a2cc07c0';
+var authToken = '9a93918597cfc083f72a4f443b4420ef';
+var twilio = require('twilio');
 //var client = new twilio.RestClient(accountSid, authToken);
 
 app.set('view engine', 'jade');
@@ -34,23 +34,24 @@ MongoClient.connect('mongodb://heroku_cxgp2vvm:caetrp2v57asq6a593ub7i7891@ds1492
 		collection.drop();
 		res.redirect('/anime');
 	};
-	// var voteSMS = function(req, res){
-	// 	if(twilio.validateExpressRequest(req, authToken)){
-	// 		res.header('Content-Type', 'text/xml');
-	// 		var body = req.param('Body').trim();
-	// 		var to = req.param('To'); // Number vote is sent to.
-	// 		var from = req.param('From'); // Voter number.
-	// 		var body = req.param('Body');
+	var voteSMS = function(req, res){
+		if(twilio.validateExpressRequest(req, authToken)){
+			res.header('Content-Type', 'text/xml');
+			var body = req.param('Body').trim();
+			var to = req.param('To'); // Number vote is sent to.
+			var from = req.param('From'); // Voter number.
+			var body = req.param('Body');
 
-	// 		res.send('<Response><Sms>If you get this, then it means shit worked.</Sms></Response>'); 
-	// 	}
-	// }
+			res.send('<Response><Sms>If you get this, then it means shit worked.</Sms></Response>'); 
+		}
+	}
 	var redir = function(req, res){
 		res.redirect('/anime');
 	}
 
+	app.get('/vote', index);
 	app.get('/', redir);
-	// app.post('/vote', voteSMS);
+	app.post('/vote', voteSMS);
 	app.get('/anime', index);
 	app.post('/anime', addAnime);
 	app.get('/reset', resetAnime);
