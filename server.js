@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 app.use(bodyParser());
-var port = 3000;
+var port = process.env.PORT || 8080; // process.env.PORT lets heroku set the port.
 MongoClient = require('mongodb').MongoClient;
 
 var accountSid = 'AC9550722b43b00be70c63b686a2cc07c0';
