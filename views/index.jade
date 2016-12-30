@@ -1,0 +1,30 @@
+html
+	head
+		style
+			include css/progressBar.css
+
+	block content
+	center
+		h1 JAC Vote
+		img(src= "http://i.schoolido.lu/chibi/Mochaqt.png")
+
+	div.progressWrapper
+		-i = 1;
+		-choices.forEach(function(choice){
+			center 
+				h2(style=" color: blue;") #{choice.title}
+			div.progressBar
+				span(id= choice.title).progressBarFill
+			-i = i+1;
+		-});
+
+	script.
+		var progress = 0;
+		var bar = document.getElementById("LWA");
+		var Interval = window.setInterval(startWatch, 500);
+		function startWatch(){
+			if(progress < 100){
+			progress += 2;}
+			bar.style = "width: " + progress + "%;";
+			console.log("desu");
+		}
