@@ -14,7 +14,7 @@ app.set('view engine', 'jade');
 
 app.use(express.static(__dirname + '/public')); // This allows anything in /public tobe served as if it were in the main directory.
 
-MongoClient.connect('mongodb://127.0.0.1:27017/animetest', function(err,db){
+MongoClient.connect('mongodb://heroku_cxgp2vvm:caetrp2v57asq6a593ub7i7891@ds149268.mlab.com:49268/heroku_cxgp2vvm/animetest', function(err,db){
 	if(err) throw err;
 	var collection = db.collection('anime');
 
