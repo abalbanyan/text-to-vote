@@ -10,6 +10,9 @@ var authToken = '9a93918597cfc083f72a4f443b4420ef';
 var twilio = require('twilio')(accountSid, authToken);
 //var client = new twilio.RestClient(accountSid, authToken);
 
+var curID = 1; // dumb hack
+var peopleVoted = []; // bad idea
+
 app.set('view engine', 'jade');
 
 app.use(express.static(__dirname + '/public')); // This allows anything in /public tobe served as if it were in the main directory.
@@ -26,6 +29,8 @@ MongoClient.connect('mongodb://heroku_cxgp2vvm:caetrp2v57asq6a593ub7i7891@ds1492
 	};
 	var addAnime = function(req, res){
 		req.body.votes = 2;
+		req.body.animeID = curID;
+		animeID = animeID + 1;
 		collection.insert(req.body, function(err, docs){
 			console.log(docs);
 			res.redirect('/anime');
@@ -33,6 +38,7 @@ MongoClient.connect('mongodb://heroku_cxgp2vvm:caetrp2v57asq6a593ub7i7891@ds1492
 	};
 	var resetAnime = function(req, res){
 		collection.drop();
+		animeID = 1;
 		res.redirect('/anime');
 	};
 	var voteSMS = function(req, res){
@@ -40,13 +46,35 @@ MongoClient.connect('mongodb://heroku_cxgp2vvm:caetrp2v57asq6a593ub7i7891@ds1492
 		var textFrom = req.body.From;
 		var textBody = req.body.Body;
 
-		res.send(`
-			<Response>
-				<Message>
-					Thanks! Your vote for ${textBody} has been recorded.
-				</Message>
-			</Response>
-		`);
+		if(peopleVotes.indexOf(textFrom) < 0){
+			res.send(`
+				<Response>
+					<Message>
+						Sorry, you may only vote once.
+					</Message>
+				</Response>
+			`);			
+		}
+		else if(textBody > curID){
+			res.send(`
+				<Response>
+					<Message>
+						Thanks! Your vote for ${textBody} has been recorded.
+					</Message>
+				</Response>
+			`);
+			peopleVoted.push(textFrom);
+			collection.update({"animeID" : textBody}, {"$inc" : {"votes" : 1}})
+		}
+		else{
+			res.send(`
+				<Response>
+					<Message>
+						Sorry, your vote for ${textBody} is invalid. Make sure your vote is a number between 1 and ${curID}.
+					</Message>
+				</Response>
+			`);
+		}
 	}
 	var redir = function(req, res){
 		res.redirect('/anime');
