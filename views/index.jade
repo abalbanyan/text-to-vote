@@ -9,13 +9,11 @@ html
 		img(src= "http://i.schoolido.lu/chibi/Mochaqt.png")
 
 	div.progressWrapper
-		-i = 1;
 		-choices.forEach(function(choice){
 			center 
 				h2(style=" color: blue;") #{choice.title}
 			div.progressBar
-				span(id= choice.title).progressBarFill
-			-i = i+1;
+				span(id= choice.animeID).progressBarFill
 		-});
 	br
 	br
