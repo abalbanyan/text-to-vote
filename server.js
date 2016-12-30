@@ -42,10 +42,14 @@ MongoClient.connect('mongodb://127.0.0.1:27017/animetest', function(err,db){
 			var from = req.param('From'); // Voter number.
 			var body = req.param('Body');
 
-			response.send('<Response><Sms>If you get this, then it means shit worked.</Sms></Response>'); 
+			res.send('<Response><Sms>If you get this, then it means shit worked.</Sms></Response>'); 
 		}
 	}
+	var redir = function(req, res){
+		res.redirect('/anime');
+	}
 
+	app.get('/', redir);
 	app.post('/vote', voteSMS);
 	app.get('/anime', index);
 	app.post('/anime', addAnime);
