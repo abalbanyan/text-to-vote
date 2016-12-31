@@ -29,15 +29,15 @@ html
 	script.
 		var socket = io.connect();
 
-//	script var data = !{JSON.stringify(choices)}
-//	script.
-//		var Interval = window.setInterval(updateVotes, 1000);
-//		function updateVotes(){
-//			data.forEach(function(anime){
-//				var bar = document.getElementById(anime.animeID);
-//				bar.style = "width: " + anime.votes + "%;";
-//			});
-//		}
+	script var data = !{JSON.stringify(choices)}
+	script.
+		var Interval = window.setInterval(updateVotes, 1000);
+		function updateVotes(){
+			data.forEach(function(anime){
+				var bar = document.getElementById(anime.animeID);
+				bar.style = "width: " + anime.votes + "%;";
+			});
+		}
 //	script.
 //		var progress = 0;
 //		var bar = document.getElementById("LWA");
