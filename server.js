@@ -10,6 +10,16 @@ var authToken = '9a93918597cfc083f72a4f443b4420ef';
 var twilio = require('twilio')(accountSid, authToken);
 //var client = new twilio.RestClient(accountSid, authToken);
 
+// SOCKETIO STUFF
+var socketio = require('socket.io');
+var server = require('http').createServer(app);
+var io = socketio.listen(server);
+io.sockets.on('connection', function(socket){
+	socket.on('event', function(event){
+		socket.join(event);
+	});
+});
+
 var peopleVoted = []; // dumb hack
 
 app.set('view engine', 'jade');
@@ -27,12 +37,15 @@ MongoClient.connect('mongodb://heroku_cxgp2vvm:caetrp2v57asq6a593ub7i7891@ds1492
 		});
 	};
 	var addAnime = function(req, res){
-		req.body.votes = 2;
-		req.body.animeID = toString(collection.count() + 1);
-		console.log(req.body);
-		collection.insert(req.body, function(err, docs){
-			console.log(docs);
-			res.redirect('/anime');
+		collection.count({}, function(errcount, num){
+			if(err) return console.log(errcount);
+			req.body.animeID = num + 1;
+			req.body.votes = 10;
+			collection.insert(req.body, function(err, docs){
+				console.log(docs);
+				res.redirect('/anime');
+			});
+
 		});
 	};
 	var resetAnime = function(req, res){
@@ -44,38 +57,51 @@ MongoClient.connect('mongodb://heroku_cxgp2vvm:caetrp2v57asq6a593ub7i7891@ds1492
 		var textFrom = req.body.From;
 		var textBody = req.body.Body;
 
-		if(peopleVoted.indexOf(textFrom) < 0){
-			res.send(`
-				<Response>
-					<Message>
-						Sorry, you may only vote once.
-					</Message>
-				</Response>
-			`);			
-		}
-		else if(textBody > collection.count()){
-			res.send(`
-				<Response>
-					<Message>
-						Thanks! Your vote for ${textBody} has been recorded.
-					</Message>
-				</Response>
-			`);
-			peopleVoted.push(textFrom);
-			collection.update({"animeID" : textBody}, {"$inc" : {"votes" : 1}})
-		}
-		else{
-			res.send(`
-				<Response>
-					<Message>
-						Sorry, your vote for ${textBody} is invalid. Make sure your vote is a number between 1 and ${collection.count()}.
-					</Message>
-				</Response>
-			`);
-		}
+		collection.count({}, function(err, num){
+			if(peopleVoted.indexOf(textFrom) >= 0){
+				res.send(`
+					<Response>
+						<Message>
+							Sorry, you may only vote once.
+						</Message>
+					</Response>
+				`);			
+			}
+			else if(textBody <= num){
+				res.send(`
+					<Response>
+						<Message>
+							Thanks! Your vote for ${textBody} has been recorded.
+						</Message>
+					</Response>
+				`);
+				peopleVoted.push(textFrom);
+				collection.update({"animeID" : textBody}, {"$inc" : {"votes" : 1}});
+			}
+			else{
+				res.send(`
+					<Response>
+						<Message>
+							Sorry, your vote for ${textBody} is invalid. Make sure your vote is a number between 1 and ${num}.
+						</Message>
+					</Response>
+				`);
+			}
+		});
 	}
 	var redir = function(req, res){
 		res.redirect('/anime');
+	}
+
+	var updateVotes = function(req, res){
+		console.log(req.body.title);
+		console.log(req.body.animeID);
+		console.log(req.body.votes);
+		collection.update({"title" : req.body.title}, {$set: {"votes": req.body.votes}}, function(err, doc){
+			if(err) console.log(err);
+			console.log(doc);
+			res.redirect('/update.html');
+		});
 	}
 
 	app.get('/', redir);
@@ -87,6 +113,8 @@ MongoClient.connect('mongodb://heroku_cxgp2vvm:caetrp2v57asq6a593ub7i7891@ds1492
 	app.post('/anime', addAnime);
 	
 	app.get('/reset', resetAnime);
+
+	app.post('/updatevotes', updateVotes);
 
 	app.listen(port);
 	console.log('Server is on %s', port);

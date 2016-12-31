@@ -11,7 +11,8 @@
   	"express":"*",
   	"jade":"*",
   	"body-parser":"*",
-  	"twilio":"*"
+  	"twilio":"*",
+    "socket.io":"0.9.11"
   },
   "author": "",
   "license": "ISC"

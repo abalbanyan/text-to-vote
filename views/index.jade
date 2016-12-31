@@ -12,6 +12,7 @@ html
 		-choices.forEach(function(choice){
 			center 
 				h2(style=" color: blue;") #{choice.title}
+				h4 #{choice.votes}
 			div.progressBar
 				span(id= choice.animeID).progressBarFill
 		-});
@@ -22,6 +23,21 @@ html
 		br
 		a(href="/reset") Reset Votes
 
+	script(src="/socket.io/socket.io.js")
+	script(src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js")
+	script(src="/javascripts/highcharts.js")
+	script.
+		var socket = io.connect();
+
+//	script var data = !{JSON.stringify(choices)}
+//	script.
+//		var Interval = window.setInterval(updateVotes, 1000);
+//		function updateVotes(){
+//			data.forEach(function(anime){
+//				var bar = document.getElementById(anime.animeID);
+//				bar.style = "width: " + anime.votes + "%;";
+//			});
+//		}
 //	script.
 //		var progress = 0;
 //		var bar = document.getElementById("LWA");
