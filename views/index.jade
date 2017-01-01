@@ -34,7 +34,7 @@ html
 
 	script(src="/socket.io/socket.io.js")
 	script.
-		var socket = io.connect();
+		var socket = io.connect('/');
 		console.log("Connected to socket.");
 		socket.on('vote', function(msg){
 			console.log("Incoming vote!");
