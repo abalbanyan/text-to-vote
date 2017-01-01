@@ -6,7 +6,7 @@ console.log(config.defaultport);
 console.log(config.twilioSID);
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended: false}));
-app.set('port', process.env.PORT || config.defaultport); // process.env.PORT lets heroku set the port.
+app.set('port', (process.env.PORT || config.defaultport); // process.env.PORT lets heroku set the port.
 MongoClient = require('mongodb').MongoClient;
 
 var twilio = require('twilio')(config.twilioSID, config.twilioAuth);
