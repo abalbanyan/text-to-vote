@@ -2,22 +2,25 @@ var express = require('express');
 var app = express();
 var config = require('./config');
 
-console.log(config.defaultport);
-console.log(config.twilioSID);
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended: false}));
-app.set('port', process.env.PORT || config.defaultport); // process.env.PORT lets heroku set the port.
+app.set('port', (process.env.PORT || config.defaultport)); // process.env.PORT lets heroku set the port.
 MongoClient = require('mongodb').MongoClient;
 
 var twilio = require('twilio')(config.twilioSID, config.twilioAuth);
 
 // SOCKETIO STUFF
-var http = require('http');
-var socketio = require('socket.io');
-var server = http.createServer(app);
-var io = socketio.listen(server);
-server.listen(app.get('port'), function(){
+//var http = require('http');
+//var socketio = require('socket.io');
+var server = app.listen(app.get('port'), function(){
 	console.log("Express server listening on port " + app.get('port'));
+});
+var io = require('socket.io')(server);
+
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+  next();
 });
 
 var peopleVoted = []; // dumb hack
