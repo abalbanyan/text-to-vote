@@ -1,32 +1,32 @@
 var express = require('express');
 var app = express();
+var config = require('./config');
+
+console.log(config.defaultport);
+console.log(config.twilioSID);
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended: false}));
-var port = process.env.PORT || 8080; // process.env.PORT lets heroku set the port.
+app.set('port', process.env.PORT || config.defaultport); // process.env.PORT lets heroku set the port.
 MongoClient = require('mongodb').MongoClient;
 
-var accountSid = 'AC9550722b43b00be70c63b686a2cc07c0';
-var authToken = '9a93918597cfc083f72a4f443b4420ef';
-var twilio = require('twilio')(accountSid, authToken);
-//var client = new twilio.RestClient(accountSid, authToken);
+var twilio = require('twilio')(config.twilioSID, config.twilioAuth);
 
 // SOCKETIO STUFF
+var http = require('http');
 var socketio = require('socket.io');
-var server = require('http').createServer(app);
+var server = http.createServer(app);
 var io = socketio.listen(server);
-io.sockets.on('connection', function(socket){
-	socket.on('event', function(event){
-		socket.join(event);
-	});
+server.listen(app.get('port'), function(){
+	console.log("Express server listening on port " + app.get('port'));
 });
 
 var peopleVoted = []; // dumb hack
 
 app.set('view engine', 'jade');
 
-app.use(express.static(__dirname + '/public')); // This allows anything in /public tobe served as if it were in the main directory.
+app.use(express.static(__dirname + '/public')); // This allows anything in /public to be served as if it were in the main directory.
 
-MongoClient.connect('mongodb://heroku_cxgp2vvm:caetrp2v57asq6a593ub7i7891@ds149268.mlab.com:49268/heroku_cxgp2vvm', function(err,db){
+MongoClient.connect(config.mongoURL, function(err,db){
 	if(err) throw err;
 	var collection = db.collection('anime');
 
@@ -39,8 +39,9 @@ MongoClient.connect('mongodb://heroku_cxgp2vvm:caetrp2v57asq6a593ub7i7891@ds1492
 	var addAnime = function(req, res){
 		collection.count({}, function(errcount, num){
 			if(err) return console.log(errcount);
-			req.body.animeID = num + 1;
-			req.body.votes = 10;
+			req.body.animeID = (num + 1).toString();
+			req.body.votes = 0;
+			console.log(req.body);
 			collection.insert(req.body, function(err, docs){
 				console.log(docs);
 				res.redirect('/anime');
@@ -76,7 +77,9 @@ MongoClient.connect('mongodb://heroku_cxgp2vvm:caetrp2v57asq6a593ub7i7891@ds1492
 					</Response>
 				`);
 				peopleVoted.push(textFrom);
-				collection.update({"animeID" : textBody}, {"$inc" : {"votes" : 1}});
+				collection.update({"animeID" : textBody}, {"$inc" : {"votes" : 1}}, function(err, doc){
+					if(err) console.log("Error occured updating.");
+				});
 			}
 			else{
 				res.send(`
@@ -89,22 +92,30 @@ MongoClient.connect('mongodb://heroku_cxgp2vvm:caetrp2v57asq6a593ub7i7891@ds1492
 			}
 		});
 	}
-	var redir = function(req, res){
-		res.redirect('/anime');
-	}
 
-	var updateVotes = function(req, res){
-		console.log(req.body.title);
-		console.log(req.body.animeID);
-		console.log(req.body.votes);
-		collection.update({"title" : req.body.title}, {$set: {"votes": req.body.votes}}, function(err, doc){
-			if(err) console.log(err);
-			console.log(doc);
-			res.redirect('/update.html');
+	var testVote = function(req, res){
+		collection.update(
+			{
+				"animeID": req.body.animeID
+			}, 
+			{
+				$inc : 
+					{
+						"votes": 1
+					}
+			}, 
+			function(err, doc){
+				if(err) console.log("Error occured.");
+				console.log("Sent a vote to %s.", req.body.animeID);
+				res.redirect('/testvote.html');
 		});
+		io.emit('vote', {vote : req.body.animeID});
 	}
 
-	app.get('/', redir);
+	// Routes:
+	app.get('/', function(req, res){
+		res.redirect('/anime');
+	});
 	
 	app.get('/vote', index);
 	app.post('/vote', voteSMS);
@@ -114,8 +125,5 @@ MongoClient.connect('mongodb://heroku_cxgp2vvm:caetrp2v57asq6a593ub7i7891@ds1492
 	
 	app.get('/reset', resetAnime);
 
-	app.post('/updatevotes', updateVotes);
-
-	app.listen(port);
-	console.log('Server is on %s', port);
+	app.post('/testvote', testVote);
 });
