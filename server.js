@@ -56,6 +56,11 @@ MongoClient.connect(config.mongoURL, function(err,db){
 		collection.drop();
 		res.redirect('/anime');
 	};
+	var resetVotes = function(req, res){
+		peopleVoted = [];
+		collection.update({}, {"$set" : {"votes" : 0}}, {multi:true});
+		res.redirect('/anime');
+	}
 	var voteSMS = function(req, res){
 		console.log(req.body) // Details about the incoming text are passed into the body of the request.
 		var textFrom = req.body.From;
@@ -72,13 +77,15 @@ MongoClient.connect(config.mongoURL, function(err,db){
 				`);			
 			}
 			else if(textBody <= num){
-				res.send(`
-					<Response>
-						<Message>
-							Thanks! Your vote for ${textBody} has been recorded.
-						</Message>
-					</Response>
-				`);
+				collection.find().toArray(function(err, choices){
+					res.send(`
+						<Response>
+							<Message>
+								Thanks! Your vote for ${choices[textBody-1].title} has been recorded.
+							</Message>
+						</Response>
+					`);
+				});
 				peopleVoted.push(textFrom);
 				collection.update({"animeID" : textBody}, {"$inc" : {"votes" : 1}}, function(err, doc){
 					if(err) console.log("Error occured updating.");
@@ -127,6 +134,7 @@ MongoClient.connect(config.mongoURL, function(err,db){
 	app.post('/anime', addAnime);
 	
 	app.get('/reset', resetAnime);
+	app.get('/resetvotes', resetVotes);
 
 	app.post('/testvote', testVote);
 });
