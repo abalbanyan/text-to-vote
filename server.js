@@ -90,7 +90,7 @@ MongoClient.connect(config.mongoURL, function(err,db){
 				//peopleVoted.push(textFrom);
 				collection.update({"animeID" : textBody}, {"$inc" : {"votes" : 1}}, function(err, doc){
 					if(err) console.log("Error occured updating.");
-					io.emit('vote', {vote : req.body.animeID});
+					io.emit('vote', {vote : req.body.Body});
 				});
 			}
 			else{
