@@ -76,7 +76,7 @@ MongoClient.connect(config.mongoURL, function(err,db){
 					</Response>
 				`);			
 			}
-			else if(textBody <= num){
+			else if(textBody <= num && textBody> 0){
 				collection.find().toArray(function(err, choices){
 					res.send(`
 						<Response>
@@ -86,7 +86,7 @@ MongoClient.connect(config.mongoURL, function(err,db){
 						</Response>
 					`);
 				});
-				peopleVoted.push(textFrom);
+				//peopleVoted.push(textFrom);
 				collection.update({"animeID" : textBody}, {"$inc" : {"votes" : 1}}, function(err, doc){
 					if(err) console.log("Error occured updating.");
 				});
@@ -104,22 +104,28 @@ MongoClient.connect(config.mongoURL, function(err,db){
 	}
 
 	var testVote = function(req, res){
-		collection.update(
-			{
-				"animeID": req.body.animeID
-			}, 
-			{
-				$inc : 
-					{
-						"votes": 1
-					}
-			}, 
-			function(err, doc){
-				if(err) console.log("Error occured.");
-				console.log("Sent a vote to %s.", req.body.animeID);
-				res.redirect('/testvote.html');
+		collection.count({}, function(err, num){
+			if(req.body.animeID > num) {
+				console.log("Too high.");
+				return res.redirect('/testvote.html');
+			}
+			collection.update(
+				{
+					"animeID": req.body.animeID
+				}, 
+				{
+					$inc : 
+						{
+							"votes": 1
+						}
+				}, 
+				function(err, doc){
+					if(err) console.log("Error occured.");
+					console.log("Sent a vote to %s.", req.body.animeID);
+					res.redirect('/testvote.html');
+			});
+			io.emit('vote', {vote : req.body.animeID});
 		});
-		io.emit('vote', {vote : req.body.animeID});
 	}
 
 	// Routes:

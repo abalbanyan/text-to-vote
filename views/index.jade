@@ -7,8 +7,8 @@ html
 	center
 		span
 		h1 Text your votes to (812) 420-1234!
-		img(src= "http://i.imgur.com/I90I6Xg.png" style="height:183px;")
-		img(src= "http://i.imgur.com/Z7qV5LL.png" style="width:116px;height:183px;")
+		img(src= "https://i.imgur.com/I90I6Xg.png" style="height:183px;")
+		img(src= "https://i.imgur.com/Z7qV5LL.png" style="width:116px;height:183px;")
 
 	div.progressWrapper
 		-choices.forEach(function(choice){
@@ -28,6 +28,9 @@ html
 		br
 		br
 		a(href="/reset") Reset Everything
+		br
+		br
+		a(href="/testvote.html") Test Vote
 
 	script var data = !{JSON.stringify(choices)}
 	script var animeVotes = [];
