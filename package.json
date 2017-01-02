@@ -9,7 +9,6 @@
   "dependencies" : {
   	"mongodb" : "*",
   	"express":"*",
-    "express-ws":"^0.2.6",
   	"jade":"*",
   	"body-parser":"*",
   	"twilio":"*",

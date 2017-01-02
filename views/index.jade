@@ -5,13 +5,15 @@ html
 
 	block content
 	center
-		h1 JAC Vote
-		img(src= "http://i.schoolido.lu/chibi/Mochaqt.png")
+		span
+		h1 Text your votes to (812) 420-1234!
+		img(src= "http://i.imgur.com/I90I6Xg.png" style="height:183px;")
+		img(src= "http://i.imgur.com/Z7qV5LL.png" style="width:116px;height:183px;")
 
 	div.progressWrapper
 		-choices.forEach(function(choice){
 			center 
-				h2(style=" color: blue;") #{choice.title}
+				h2(style=" color: blue;") #{choice.title} ----- Text "#{choice.animeID}"
 				//h4(id= "tally" + choice.animeID) #{choice.votes}
 			div.progressBar
 				span(id= choice.animeID).progressBarFill
@@ -21,14 +23,18 @@ html
 	center
 		a(href="/new.html") Add New Anime Choice
 		br
-		a(href="/reset") Reset Votes
+		br
+		a(href="/resetvotes") Reset Votes
+		br
+		br
+		a(href="/reset") Reset Everything
 
 	script var data = !{JSON.stringify(choices)}
 	script var animeVotes = [];
 	script.
 		data.forEach(function(anime){
 			var bar = document.getElementById(anime.animeID);
-			bar.style = "width: " + anime.votes + "%;";
+			bar.style = "width: " + (2* anime.votes) + "%;";
 			animeVotes.push(anime.votes);
 		});
 
@@ -41,20 +47,9 @@ html
 			console.log(msg.vote);
 			animeVotes[msg.vote - 1]++;
 			var bar = document.getElementById(msg.vote);
-			bar.style = "width: " + animeVotes[msg.vote - 1] + "%;"; 
-
+			bar.style = "width: " + (animeVotes[msg.vote - 1] * 2) + "%;"; 
+			// This is pretty hacky but it works. :^)
 		});		
 
 	// Note that JQuery 1.6 has a += operator. 
 	// $( '#new' ).css( 'top', '+=10px' );
-
-//-	script.
-//-		var progress = 0;
-//-		var bar = document.getElementById("LWA");
-//-		var Interval = window.setInterval(startWatch, 500);
-//-		function startWatch(){
-//-			if(progress < 100){
-//-			progress += 2;}
-//-			bar.style = "width: " + progress + "%;";
-//-			console.log("desu");
-//-		}
