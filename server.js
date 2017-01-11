@@ -80,7 +80,11 @@ MongoClient.connect(config.mongoURL, function(err,db){
 			else if(textBody <= num && textBody> 0){
 				collection.find().toArray(function(err, choices){
 					res.send(`
+						<Response>
+							<Message>
 								Thanks! Your vote for ${choices[textBody-1].title} has been recorded.
+							<Message>
+						<Response>
 					`);
 				});
 				//peopleVoted.push(textFrom);
