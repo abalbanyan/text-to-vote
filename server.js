@@ -81,10 +81,9 @@ MongoClient.connect(config.mongoURL, function(err,db){
 				collection.find().toArray(function(err, choices){
 					res.send(`
 						<Response>
-							<Message>
+					
 								Thanks! Your vote for ${choices[textBody-1].title} has been recorded.
-							<Message>
-						<Response>
+						</Response>
 					`);
 				});
 				//peopleVoted.push(textFrom);
