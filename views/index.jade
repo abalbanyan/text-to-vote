@@ -4,19 +4,27 @@ html
 			include css/progressBar.css
 
 	block content
+	br
+	br
+	br
 	center
 		span
-		h1 Text your votes to (812) 420-1234!
+		h1(style = " font-weight:bold; color: white;") 
+			span.textBackground Text your votes to (812) 420-1234!
 		img(src= "https://i.imgur.com/I90I6Xg.png" style="height:183px;")
 		img(src= "https://i.imgur.com/Z7qV5LL.png" style="width:116px;height:183px;")
+
+	-var badColorSelector = ["pink", "red", "green", "white", "pink"];
 
 	div.progressWrapper
 		-choices.forEach(function(choice){
 			center 
-				h2(style=" color: blue;") #{choice.title} ----- Text "#{choice.animeID}"
-				//h4(id= "tally" + choice.animeID) #{choice.votes}
+				h2(style=" color: #{badColorSelector[choice.animeID]};")
+					span.textBackground Text "#{choice.animeID}": #{choice.title} 
 			div.progressBar
 				span(id= choice.animeID).progressBarFill
+					span(id= "tally" + choice.animeID).progressNumber #{choice.votes} votes!
+			br
 		-});
 	br
 	br
@@ -32,15 +40,17 @@ html
 		br
 		a(href="/testvote.html") Test Vote
 
+	// This code is used to initialize the number of votes when we refresh.
 	script var data = !{JSON.stringify(choices)}
 	script var animeVotes = [];
 	script.
 		data.forEach(function(anime){
 			var bar = document.getElementById(anime.animeID);
-			bar.style = "width: " + (2* anime.votes) + "%;";
+			bar.style = "width: " + (4 * anime.votes) + "%;";
 			animeVotes.push(anime.votes);
 		});
 
+	// This is used to receive votes and update the page in real-time.
 	script(src="/socket.io/socket.io.js")
 	script.
 		var socket = io.connect('/');
@@ -50,8 +60,12 @@ html
 			console.log(msg.vote);
 			animeVotes[msg.vote - 1]++;
 			var bar = document.getElementById(msg.vote);
-			bar.style = "width: " + (animeVotes[msg.vote - 1] * 2) + "%;"; 
+			bar.style = "width: " + (animeVotes[msg.vote - 1] * 4) + "%;"; 
 			// This is pretty hacky but it works. :^)
+			if(animeVotes[msg.vote - 1] * 4 <= 100)
+				document.getElementById("tally" + msg.vote).innerHTML = animeVotes[msg.vote - 1] + " votes!";
+			else
+				document.getElementById("tally" + msg.vote).innerHTML = "B E Y O N D  T H E  B O U N D A R Y";
 		});		
 
 	| <html>
@@ -59,7 +73,7 @@ html
 	| </head>
 	| <body>
 	| <div align="center" id="img" style="position:absolute;">
-	| <img src="https://rs151.pbsrc.com/albums/s130/Elmerpr13/Games/SpinLink.gif~c200" style="height:50px;"" onMouseDown="pauseResume();">
+	| <img src="http://rs125.pbsrc.com/albums/p68/alongway99/Halloween%20Animations/Witch%20Animations/BroomSweeps.gif~c200" style="height:60px;"" onMouseDown="pauseResume();">
 	| </div>
 	| <SCRIPT LANGUAGE="JavaScript">
 	| var step = 5;
