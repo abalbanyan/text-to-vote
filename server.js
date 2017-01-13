@@ -69,6 +69,13 @@ MongoClient.connect(config.mongoURL, function(err,db){
 
 		collection.count({}, function(err, num){
 			if(peopleVoted.indexOf(textFrom) >= 0){
+				
+				var twiml = new twilio.TwimlResponse();
+            	twiml.message("Sorry, you may only vote once.");
+            	res.type('text/xml');
+            	res.send(twiml.toString());
+           		return;
+
 				res.send(`
 					<Response>
 						<Message>
@@ -79,6 +86,13 @@ MongoClient.connect(config.mongoURL, function(err,db){
 			}
 			else if(textBody <= num && textBody> 0){
 				collection.find().toArray(function(err, choices){
+
+					var twiml = new twilio.TwimlResponse();
+	            	twiml.message("Thanks! Your vote for ${choices[textBody-1].title} has been recorded.");
+	            	res.type('text/xml');
+	            	res.send(twiml.toString());
+	           		return;
+
 					res.send(`
 						<Response>
 							<Message>
@@ -94,6 +108,13 @@ MongoClient.connect(config.mongoURL, function(err,db){
 				});
 			}
 			else{
+
+				var twiml = new twilio.TwimlResponse();
+            	twiml.message("Sorry, your vote for ${textBody} is invalid. Make sure your vote is a number between 1 and ${num}.");
+            	res.type('text/xml');
+            	res.send(twiml.toString());
+           		return;
+
 				res.send(`
 					<Response>
 						<Message>
