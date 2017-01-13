@@ -74,15 +74,14 @@ MongoClient.connect(config.mongoURL, function(err,db){
             	twiml.message("Sorry, you may only vote once.");
             	res.type('text/xml');
             	res.send(twiml.toString());
-           		return;
 
-				res.send(`
-					<Response>
-						<Message>
-							Sorry, you may only vote once.
-						</Message>
-					</Response>
-				`);			
+				// res.send(`
+				// 	<Response>
+				// 		<Message>
+				// 			Sorry, you may only vote once.
+				// 		</Message>
+				// 	</Response>
+				// `);			
 			}
 			else if(textBody <= num && textBody> 0){
 				collection.find().toArray(function(err, choices){
@@ -93,13 +92,13 @@ MongoClient.connect(config.mongoURL, function(err,db){
 	            	res.send(twiml.toString());
 	           		return;
 
-					res.send(`
-						<Response>
-							<Message>
-								Thanks! Your vote for ${choices[textBody-1].title} has been recorded.
-							</Message>
-						</Response>
-					`);
+					// res.send(`
+					// 	<Response>
+					// 		<Message>
+					// 			Thanks! Your vote for ${choices[textBody-1].title} has been recorded.
+					// 		</Message>
+					// 	</Response>
+					// `);
 				});
 				peopleVoted.push(textFrom);
 				collection.update({"animeID" : textBody}, {"$inc" : {"votes" : 1}}, function(err, doc){
@@ -115,13 +114,13 @@ MongoClient.connect(config.mongoURL, function(err,db){
             	res.send(twiml.toString());
            		return;
 
-				res.send(`
-					<Response>
-						<Message>
-							Sorry, your vote for ${textBody} is invalid. Make sure your vote is a number between 1 and ${num}.
-						</Message>
-					</Response>
-				`);
+				// res.send(`
+				// 	<Response>
+				// 		<Message>
+				// 			Sorry, your vote for ${textBody} is invalid. Make sure your vote is a number between 1 and ${num}.
+				// 		</Message>
+				// 	</Response>
+				// `);
 			}
 		});
 	}
