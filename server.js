@@ -90,7 +90,7 @@ MongoClient.connect(config.mongoURL, function(err,db){
 	            	twiml.message("Thanks! Your vote for ${choices[textBody-1].title} has been recorded.");
 	            	res.type('text/xml');
 	            	res.send(twiml.toString());
-	           		return;
+	           		//return;
 
 					// res.send(`
 					// 	<Response>
@@ -112,7 +112,7 @@ MongoClient.connect(config.mongoURL, function(err,db){
             	twiml.message("Sorry, your vote for ${textBody} is invalid. Make sure your vote is a number between 1 and ${num}.");
             	res.type('text/xml');
             	res.send(twiml.toString());
-           		return;
+           		//return;
 
 				// res.send(`
 				// 	<Response>
