@@ -67,6 +67,8 @@ MongoClient.connect(config.mongoURL, function(err,db){
 		var textFrom = req.body.From;
 		var textBody = req.body.Body;
 
+		var votes = textBody.split(" ");
+
 		collection.count({}, function(err, num){
 			if(peopleVoted.indexOf(textFrom) >= 0){
 				res.send(`
@@ -87,11 +89,14 @@ MongoClient.connect(config.mongoURL, function(err,db){
 						</Response>
 					`);
 				});
-				peopleVoted.push(textFrom);
-				collection.update({"animeID" : textBody}, {"$inc" : {"votes" : 1}}, function(err, doc){
-					if(err) console.log("Error occured updating.");
-					io.emit('vote', {vote : req.body.Body});
+				peopleVoted.push(textFrom); 
+				votes.forEach(function(vote){
+					collection.update({"animeID" : vote}, {"$inc" : {"votes" : 1}}, function(err, doc){
+						if(err) console.log("Error occured updating.");
+						io.emit('vote', {vote : vote});
+					});
 				});
+				
 			}
 			else{
 				res.send(`
