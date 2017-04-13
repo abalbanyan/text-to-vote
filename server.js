@@ -79,15 +79,24 @@ MongoClient.connect(config.mongoURL, function(err,db){
 					</Response>
 				`);			
 			}
-			else if(votes.length <= 2){
+			else if(votes.length <= 2 || !votes[0]){
 				collection.find().toArray(function(err, choices){
-					res.send(`
-						<Response>
-							<Message>
-								Thanks! Your vote for ${choices[votes[0]-1].title} and ${choices[votes[1]-1].title} has been recorded.
-							</Message>
-						</Response>
-					`);
+					if(votes.length == 1)
+						res.send(`
+							<Response>
+								<Message>
+									Thanks! Your vote for ${choices[votes[0]-1].title} has been recorded.
+								</Message>
+							</Response>
+						`);
+					else
+						res.send(`
+							<Response>
+								<Message>
+									Thanks! Your votes for ${choices[votes[0]-1].title} and ${choices[votes[1]-1].title} have been recorded.
+								</Message>
+							</Response>
+						`);
 				});
 				peopleVoted.push(textFrom); 
 				votes.forEach(function(vote){
@@ -111,7 +120,7 @@ MongoClient.connect(config.mongoURL, function(err,db){
 				res.send(`
 					<Response>
 						<Message>
-							Sorry, your vote for ${textBody} is invalid. 
+							Sorry, your vote for ${textBody} is invalid. Please make sure your vote is formatted like this: "5 6", or "1". 
 						</Message>
 					</Response>
 				`);
