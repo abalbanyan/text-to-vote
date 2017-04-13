@@ -79,7 +79,7 @@ MongoClient.connect(config.mongoURL, function(err,db){
 					</Response>
 				`);			
 			}
-			else if(votes.length < 2){
+			else if(votes.length <= 2){
 				collection.find().toArray(function(err, choices){
 					res.send(`
 						<Response>
