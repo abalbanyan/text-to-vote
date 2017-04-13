@@ -79,30 +79,39 @@ MongoClient.connect(config.mongoURL, function(err,db){
 					</Response>
 				`);			
 			}
-			else if(textBody <= num && textBody> 0){
+			else if(votes.length < 2){
 				collection.find().toArray(function(err, choices){
 					res.send(`
 						<Response>
 							<Message>
-								Thanks! Your vote for ${choices[textBody-1].title} has been recorded.
+								Thanks! Your vote for ${choices[votes[0]-1].title} and ${choices[votes[1]-1].title} has been recorded.
 							</Message>
 						</Response>
 					`);
 				});
 				peopleVoted.push(textFrom); 
 				votes.forEach(function(vote){
-					collection.update({"animeID" : vote}, {"$inc" : {"votes" : 1}}, function(err, doc){
-						if(err) console.log("Error occured updating.");
-						io.emit('vote', {vote : vote});
-					});
+					if(vote <= num && vote > 0)
+						collection.update({"animeID" : vote}, {"$inc" : {"votes" : 1}}, function(err, doc){
+							if(err) console.log("Error occured updating.");
+							io.emit('vote', {vote : vote});
+						});
+					else{
+						res.send(`
+							<Response>
+								<Message>
+									Sorry, your vote for ${textBody} is invalid. Make sure your vote is a number between 1 and ${num}.
+								</Message>
+							</Response>
+						`);
+					}
 				});
-				
 			}
 			else{
 				res.send(`
 					<Response>
 						<Message>
-							Sorry, your vote for ${textBody} is invalid. Make sure your vote is a number between 1 and ${num}.
+							Sorry, your vote for ${textBody} is invalid. 
 						</Message>
 					</Response>
 				`);
