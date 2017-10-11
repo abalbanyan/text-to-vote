@@ -23,7 +23,8 @@ app.use(function(req, res, next) {
   next();
 });
 
-var peopleVoted = []; // dumb hack
+var peopleVoted = {}; // dumb hack   string (number) -> int (vote count)
+var allowedVotes = 2;
 
 app.set('view engine', 'jade');
 
@@ -53,33 +54,54 @@ MongoClient.connect(config.mongoURL, function(err,db){
 		});
 	};
 	var resetAnime = function(req, res){
-		peopleVoted = [];
+		peopleVoted = {};
 		collection.drop();
 		res.redirect('/anime');
 	};
 	var resetVotes = function(req, res){
-		peopleVoted = [];
+		peopleVoted = {};
 		collection.update({}, {"$set" : {"votes" : 0}}, {multi:true});
 		res.redirect('/anime');
 	}
+
 	var voteSMS = function(req, res){
-		console.log(req.body) // Details about the incoming text are passed into the body of the request.
 		var textFrom = req.body.From;
-		var textBody = req.body.Body;
+		var textBody = req.body.Body.trim().replace(/ +/g, " ");
 
+		// Check if the vote is valid. (for some reason, isNaN("") returns false...)
 		var votes = textBody.split(" ");
+		// console.log(`Received vote "${textBody}" from from "${textFrom}".`);
+		if (votes.length <= 0 || votes[0] == "" || (votes.filter((e) => isNaN(e)).length != 0) ) {
+			res.send(`
+				<Response>
+					<Message>
+						Sorry, your vote for "${textBody}" is invalid. Make sure your vote is formatted like this: "5 6", or "1". 
+					</Message>
+				</Response>
+			`);
+			return;
+		}
 
-		collection.count({}, function(err, num){
-			if(peopleVoted.indexOf(textFrom) >= 0){
+		collection.count({}, function(err, optionCount){
+			if(votes.length > allowedVotes || (typeof peopleVoted[textFrom] !== "undefined" && (peopleVoted[textFrom] + votes.length) > allowedVotes)){
 				res.send(`
 					<Response>
 						<Message>
-							Sorry, you may only vote once.
+							Sorry, you may only vote for a maximum of ${allowedVotes} choices.
 						</Message>
 					</Response>
 				`);			
-			}
-			else if(votes.length <= 2 || !votes[0]){
+			} else if(votes.filter((e) => (e > optionCount || e <= 0)).length != 0) {
+				res.send(`
+					<Response>
+						<Message>
+							Sorry, your vote "${textBody}" is invalid. Make sure your votes are each a number between 1 and ${optionCount} and formatted like this: "5 6", or "1".
+						</Message>
+					</Response>
+				`);					
+			} else {
+				// Vote is valid. Begin processing.
+				// Return response to user.
 				collection.find().toArray(function(err, choices){
 					if(votes.length == 1)
 						res.send(`
@@ -90,6 +112,7 @@ MongoClient.connect(config.mongoURL, function(err,db){
 							</Response>
 						`);
 					else
+						// TODO: This only lists a maximum of 2 responses.
 						res.send(`
 							<Response>
 								<Message>
@@ -98,32 +121,19 @@ MongoClient.connect(config.mongoURL, function(err,db){
 							</Response>
 						`);
 				});
-				peopleVoted.push(textFrom); 
+
+				// Record number of votes made. First check if that voter has already been initialized.
+				peopleVoted[textFrom] = (typeof peopleVoted[textFrom] === "undefined")? votes.length : votes.length + peopleVoted[textFrom];
+				peopleVoted["3109486108"] = 0; // For testing.
+
+				// Tally vote and update in database.
 				votes.forEach(function(vote){
-					if(vote <= num && vote > 0)
-						collection.update({"animeID" : vote}, {"$inc" : {"votes" : 1}}, function(err, doc){
-							if(err) console.log("Error occured updating.");
-							io.emit('vote', {vote : vote});
-						});
-					else{
-						res.send(`
-							<Response>
-								<Message>
-									Sorry, your vote for ${textBody} is invalid. Make sure your vote is a number between 1 and ${num}.
-								</Message>
-							</Response>
-						`);
-					}
+					// Update vote in database.
+					collection.update({"animeID" : vote}, {"$inc" : {"votes" : 1}}, function(err, doc){
+						if (err) console.log("Error occured updating.");
+						io.emit('vote', {vote : vote}); // This will update the vote on the tally page.
+					});
 				});
-			}
-			else{
-				res.send(`
-					<Response>
-						<Message>
-							Sorry, your vote for ${textBody} is invalid. Please make sure your vote is formatted like this: "5 6", or "1". 
-						</Message>
-					</Response>
-				`);
 			}
 		});
 	}

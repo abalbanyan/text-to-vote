@@ -1,7 +1,9 @@
+// This is garbage code, abandon hope all ye who enter.
 html
 	head
+		| <link href="https://fonts.googleapis.com/css?family=Advent+Pro" rel="stylesheet">
 		style
-			include css/progressBar.css
+			include css/style.css
 
 	block content
 	br
@@ -9,12 +11,12 @@ html
 	br
 	center
 		span
-		h1(style = " font-weight:bold; color: white;") 
+		h1(style = " font-weight:bold; color: #AA507A;") 
 			span.textBackground Text your votes to (812) 420-1234!
-		img(src= "https://i.imgur.com/I90I6Xg.png" style="height:183px;")
-		img(src= "https://i.imgur.com/Z7qV5LL.png" style="width:116px;height:183px;")
+		img(src= "https://i.imgur.com/I90I6Xg.png" style="height:150px;")
+		img(src= "https://i.imgur.com/Z7qV5LL.png" style="height:150px;")
 
-	-var badColorSelector = ["pink", "red", "green", "white", "pink"];
+	-var badColorSelector = ["pink", "red", "green", "#956565", "#FF69B4"];
 
 	div.progressWrapper
 		-choices.forEach(function(choice){
