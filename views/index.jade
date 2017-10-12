@@ -10,12 +10,17 @@ html
 	br
 	br
 	center
-		span
-		h1(style = " font-weight:bold; color: #AA507A;") 
-			span.textBackground Text your votes to (812) 420-1234!
+		div.title
+			h1(style = " font-weight:bold; color: #AA507A;") 
+				span.textBackground Text your votes to (812) 420-1234
+		h1
+			span.textInstructions e.g. "1" or "3 4"
 		img(src= "https://i.imgur.com/I90I6Xg.png" style="height:150px;")
 		img(src= "https://i.imgur.com/Z7qV5LL.png" style="height:150px;")
 
+	br
+	br
+	
 	-var badColorSelector = ["pink", "red", "green", "#956565", "#FF69B4"];
 
 	div.progressWrapper
@@ -25,22 +30,22 @@ html
 					span.textBackground Text "#{choice.animeID}": #{choice.title} 
 			div.progressBar
 				span(id= choice.animeID).progressBarFill
-					span(id= "tally" + choice.animeID).progressNumber #{choice.votes} votes!
+					span(id= "tally" + choice.animeID).progressNumber #{choice.votes} votes
 			br
 		-});
 	br
 	br
-	center
-		a(href="/new.html") Add New Anime Choice
-		br
-		br
-		a(href="/resetvotes") Reset Votes
-		br
-		br
-		a(href="/reset") Reset Everything
-		br
-		br
-		a(href="/testvote.html") Test Vote
+	//- center
+	//- 	a(href="/new.html") Add New Anime Choice
+	//- 	br
+	//- 	br
+	//- 	a(href="/resetvotes") Reset Votes
+	//- 	br
+	//- 	br
+	//- 	a(href="/reset") Reset Everything
+	//- 	br
+	//- 	br
+	//- 	a(href="/testvote.html") Test Vote
 
 	// This code is used to initialize the number of votes when we refresh.
 	script var data = !{JSON.stringify(choices)}
@@ -65,7 +70,7 @@ html
 			bar.style = "width: " + (animeVotes[msg.vote - 1] * 4) + "%;"; 
 			// This is pretty hacky but it works. :^)
 			if(animeVotes[msg.vote - 1] * 4 <= 100)
-				document.getElementById("tally" + msg.vote).innerHTML = animeVotes[msg.vote - 1] + " votes!";
+				document.getElementById("tally" + msg.vote).innerHTML = animeVotes[msg.vote - 1] + " votes";
 			else
 				document.getElementById("tally" + msg.vote).innerHTML = "B E Y O N D  T H E  B O U N D A R Y";
 		});		

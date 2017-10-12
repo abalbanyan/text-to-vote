@@ -10,22 +10,14 @@ body {
 	background-size: 1000px;
 	background-color: #FCF9EE;
 	font-family: Advent Pro;
+	letter-spacing: 3px;
 	/* background-size:cover; */
 }
 
-/*h2{
-	text-shadow: 3px 0 white, 0 3px white, 3px 0 black, 0 3px white;
-	font-size: 20px;
-}
-*/
 
-/* .h1{
-	font-family: Arial, Helvetica, sans-serif ;
+.title {
+	font-size: 30px;
 }
-.h2{
-	font-family: Arial, Helvetica, sans-serif ; 
-}
-*/
 
 .center{
 	display: inline-block;
@@ -33,7 +25,7 @@ body {
 	float: none;
 }
 .progressWrapper{
-	width: 50%;
+	width: 75%;
 	margin: auto;
 }
 
@@ -44,14 +36,13 @@ body {
 }
 
 .progressNumber{
-	font-family: Arial, Helvetica, sans-serif ;
 	display: block;
     position: absolute;
     z-index:50;
     left: 50%; /* position the left edge of the element at the middle of the parent */
    	font-weight:bold;
     transform: translateX(-50%);
-    font-size:25px;
+    font-size:22px;
 }
 
 .progressBar{
